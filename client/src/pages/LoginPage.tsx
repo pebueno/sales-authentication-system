@@ -4,8 +4,8 @@ import LoginForm from '../components/LoginForm';
 import { useAuth } from '../components/contexts/AuthContext';
 
 const LoginPage: React.FC = () => {
-  const { login } = useAuth();
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = async (data: { email: string; password: string }) => {
     try {
@@ -17,10 +17,17 @@ const LoginPage: React.FC = () => {
     }
   };
 
+  const handleRegister = () => {
+    navigate('/register');
+  };
+
   return (
-    <div className="login">
+    <div className="card">
       <h1>Login</h1>
       <LoginForm onSubmit={handleLogin} />
+      <button className="link" onClick={handleRegister}>
+        Don’t have an account? Register
+      </button>
     </div>
   );
 };

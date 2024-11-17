@@ -10,6 +10,7 @@ import Loader from './components/Loader';
 
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 
 const App: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -25,6 +26,7 @@ const App: React.FC = () => {
             }
           />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route
             path="/dashboard"
             element={

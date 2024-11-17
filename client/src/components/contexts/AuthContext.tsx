@@ -37,9 +37,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('token');
   };
 
+  const register = async (userData: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    role?: string;
+  }): Promise<void> => {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/auth/register`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData),
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error('Registration failed');
+    }
+  };
+
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated: !!token, token, login, logout }}
+      value={{ isAuthenticated: !!token, token, login, logout, register }}
     >
       {children}
     </AuthContext.Provider>
