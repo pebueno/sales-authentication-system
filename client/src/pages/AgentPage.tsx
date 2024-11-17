@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useAgents } from '../hooks/useAgents';
 import RoleRestricted from '../components/RoleRestricted';
 import { Agent } from '../components/common/types';
-import { useAuth } from '../components/contexts/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 
 const AgentPage: React.FC = () => {
+  const { auth, logout } = useAuth(); // Destructure auth from useAuth
+  const { user } = auth; // Extract user from auth
   const { fetchAgents } = useAgents();
-  const { user, logout } = useAuth();
   const [agents, setAgents] = useState<Agent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -14,7 +15,11 @@ const AgentPage: React.FC = () => {
     const loadAgents = async () => {
       try {
         const data = await fetchAgents();
-        setAgents(data);
+        if (Array.isArray(data)) {
+          setAgents(data as Agent[]);
+        } else {
+          console.error('Unexpected data format:', data);
+        }
       } catch (error) {
         console.error('Failed to fetch agents:', error);
       } finally {
@@ -23,6 +28,10 @@ const AgentPage: React.FC = () => {
     };
     loadAgents();
   }, [fetchAgents]);
+
+  if (!user) {
+    return <div>Please log in to access this page.</div>;
+  }
 
   if (isLoading) {
     return <div>Loading agents...</div>;
@@ -42,7 +51,6 @@ const AgentPage: React.FC = () => {
               <li key={agent.agentCode}>{agent.agentName}</li>
             ))}
           </ul>
-          {/* Add "Create New Agent" functionality */}
           <button>Create New Agent</button>
         </RoleRestricted>
       </main>

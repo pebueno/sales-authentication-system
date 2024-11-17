@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
+import { RegisterUserData } from './common/types';
 
 type RegisterFormProps = {
-  onSubmit: (data: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-    role?: string;
-  }) => void;
+  onSubmit: (data: RegisterUserData) => void;
 };
 
 const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<RegisterUserData>({
     firstName: '',
     lastName: '',
     email: '',
@@ -21,7 +16,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {

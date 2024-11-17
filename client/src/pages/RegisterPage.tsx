@@ -1,19 +1,14 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../components/contexts/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import RegisterForm from '../components/RegisterForm';
+import { RegisterUserData } from '../components/common/types';
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
 
-  const handleRegister = async (data: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-    role?: string;
-  }) => {
+  const handleRegister = async (data: RegisterUserData) => {
     try {
       await register(data);
       alert('Registration successful! Please log in.');

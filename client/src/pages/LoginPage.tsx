@@ -1,33 +1,27 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
-import { useAuth } from '../components/contexts/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 
 const LoginPage: React.FC = () => {
-  const navigate = useNavigate();
   const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/';
 
   const handleLogin = async (data: { email: string; password: string }) => {
     try {
       await login(data.email, data.password);
-      navigate('/dashboard');
+      navigate(from, { replace: true });
     } catch (error) {
-      console.error('Login failed:', error);
-      alert('Invalid login credentials');
+      alert('Login failed');
     }
   };
 
-  const handleRegister = () => {
-    navigate('/register');
-  };
-
   return (
-    <div className="card">
+    <div>
       <h1>Login</h1>
       <LoginForm onSubmit={handleLogin} />
-      <button className="link" onClick={handleRegister}>
-        Don’t have an account? Register
-      </button>
     </div>
   );
 };
