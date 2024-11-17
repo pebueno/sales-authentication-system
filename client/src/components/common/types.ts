@@ -14,6 +14,7 @@ export interface DashboardProps {
 export type AuthContextType = {
   isAuthenticated: boolean;
   token: string | null;
+  user: User | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   register: (userData: {

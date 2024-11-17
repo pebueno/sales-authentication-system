@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useAgents } from '../hooks/useAgents';
-import { useAuth } from './contexts/AuthContext';
+import RoleRestricted from '../components/RoleRestricted';
 import { Agent } from '../components/common/types';
+import { useAuth } from '../components/contexts/AuthContext';
 
-const DashboardPage: React.FC = () => {
+const AgentPage: React.FC = () => {
   const { fetchAgents } = useAgents();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const [agents, setAgents] = useState<Agent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -30,18 +31,23 @@ const DashboardPage: React.FC = () => {
   return (
     <div>
       <header>
-        <h1>Dashboard</h1>
+        <h1>Agent Management</h1>
         <button onClick={logout}>Logout</button>
       </header>
       <main>
-        <ul>
-          {agents.map((agent) => (
-            <li key={agent.agentCode}>{agent.agentName}</li>
-          ))}
-        </ul>
+        <RoleRestricted allowedRoles={['admin', 'agent']}>
+          <h2>Agents</h2>
+          <ul>
+            {agents.map((agent) => (
+              <li key={agent.agentCode}>{agent.agentName}</li>
+            ))}
+          </ul>
+          {/* Add "Create New Agent" functionality */}
+          <button>Create New Agent</button>
+        </RoleRestricted>
       </main>
     </div>
   );
 };
 
-export default DashboardPage;
+export default AgentPage;
