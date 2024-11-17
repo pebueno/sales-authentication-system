@@ -1,20 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
-import { login } from '../services/api';
+import { useAuth } from '../components/contexts/AuthContext';
 
 const LoginPage: React.FC = () => {
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleLogin = async (data: { email: string; password: string }) => {
     try {
-      const response = await login(data.email, data.password);
-      console.log('Login response:', response.data);
-      const token = response.data.access_token;
-      if (!token) {
-        throw new Error('Token not found in response');
-      }
-      localStorage.setItem('token', response.data.access_token);
+      await login(data.email, data.password);
       navigate('/dashboard');
     } catch (error) {
       console.error('Login failed:', error);

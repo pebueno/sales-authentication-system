@@ -1,30 +1,45 @@
 import React, { useEffect, useState } from 'react';
-import { getAgents } from '../services/api';
+import { useAgents } from '../hooks/useAgents';
+import { useAuth } from './contexts/AuthContext';
+import { Agent } from '../components/common/types';
 
 const DashboardPage: React.FC = () => {
-  const [agents, setAgents] = useState([]);
+  const { fetchAgents } = useAgents();
+  const { logout } = useAuth();
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAgents = async () => {
+    const loadAgents = async () => {
       try {
-        const response = await getAgents();
-        setAgents(response.data);
+        const data = await fetchAgents();
+        setAgents(data);
       } catch (error) {
         console.error('Failed to fetch agents:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
+    loadAgents();
+  }, [fetchAgents]);
 
-    fetchAgents();
-  }, []);
+  if (isLoading) {
+    return <div>Loading agents...</div>;
+  }
 
   return (
     <div>
-      <h1>Agents</h1>
-      <ul>
-        {agents.map((agent: any) => (
-          <li key={agent.agentCode}>{agent.agentName}</li>
-        ))}
-      </ul>
+      <header>
+        <h1>Dashboard</h1>
+        <button onClick={logout}>Logout</button>
+      </header>
+      <main>
+        <ul>
+          {agents.map((agent) => (
+            <li key={agent.agentCode}>{agent.agentName}</li>
+          ))}
+        </ul>
+      </main>
     </div>
   );
 };
