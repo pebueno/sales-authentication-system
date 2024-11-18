@@ -1,24 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography,
-  Box,
-  Button,
-} from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useAgents } from '../hooks/useAgents';
-import { Agent } from '../components/common/types';
+import AgentList from '../components/AgentList';
+import AgentForm from '../components/AgentForm';
 
 const AgentPage: React.FC = () => {
-  const { fetchAgents } = useAgents();
-  const [agents, setAgents] = useState<Agent[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { fetchAgents, addAgent, updateAgent, deleteAgent } = useAgents();
+  const [agents, setAgents] = useState<any[]>([]);
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [editingAgent, setEditingAgent] = useState<any | null>(null);
 
   useEffect(() => {
     const loadAgents = async () => {
@@ -27,91 +18,102 @@ const AgentPage: React.FC = () => {
         setAgents(data);
       } catch (error) {
         console.error('Failed to fetch agents:', error);
-      } finally {
-        setIsLoading(false);
       }
     };
     loadAgents();
   }, [fetchAgents]);
 
-  if (isLoading) {
-    return <Typography>Loading agents...</Typography>;
-  }
+  // Handle form submission (add or update)
+  const handleFormSubmit = async (formData: any) => {
+    try {
+      if (editingAgent) {
+        // Update agent
+        const updatedAgent = await updateAgent(
+          editingAgent.agentCode,
+          formData,
+        );
+        setAgents((prev) =>
+          prev.map((agent) =>
+            agent.agentCode === editingAgent.agentCode ? updatedAgent : agent,
+          ),
+        );
+        alert('Agent updated successfully!');
+      } else {
+        // Add new agent
+        const newAgent = await addAgent(formData);
+        setAgents((prev) => [...prev, newAgent]);
+        alert('Agent added successfully!');
+      }
+      setIsFormVisible(false);
+      setEditingAgent(null);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Failed to submit agent data.');
+    }
+  };
+
+  const handleAddClick = () => {
+    setEditingAgent(null);
+    setIsFormVisible(true);
+  };
+
+  const handleEditClick = (agent: any) => {
+    setEditingAgent(agent);
+    setIsFormVisible(true);
+  };
+
+  const handleCancel = () => {
+    setEditingAgent(null);
+    setIsFormVisible(false);
+  };
+
+  const handleDeleteClick = async (agentCode: string) => {
+    try {
+      await deleteAgent(agentCode);
+      setAgents((prev) =>
+        prev.filter((agent) => agent.agentCode !== agentCode),
+      );
+      alert('Agent deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting agent:', error);
+      alert('Failed to delete agent.');
+    }
+  };
 
   return (
-    <Box sx={{ padding: 3 }}>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 2,
-        }}
-      >
-        <Typography variant="h4">Agent Management</Typography>
-        <Button
-          variant="outlined"
-          color="success"
-          startIcon={<AddIcon />}
-          onClick={() => console.log('Add new agent')}
-        >
-          Add New Agent
-        </Button>
-      </Box>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Agent Code</TableCell>
-              <TableCell>Agent Name</TableCell>
-              <TableCell>Working Area</TableCell>
-              <TableCell>Commission</TableCell>
-              <TableCell>Phone No</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {agents.length > 0 ? (
-              agents.map((agent) => (
-                <TableRow key={agent.agentCode}>
-                  <TableCell>{agent.agentCode}</TableCell>
-                  <TableCell>{agent.agentName}</TableCell>
-                  <TableCell>{agent.workingArea}</TableCell>
-                  <TableCell>{agent.commission}%</TableCell>
-                  <TableCell>{agent.phoneNo}</TableCell>
-                  <TableCell>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      size="small"
-                      onClick={() => console.log('Edit agent', agent.agentCode)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      size="small"
-                      onClick={() =>
-                        console.log('Delete agent', agent.agentCode)
-                      }
-                      sx={{ marginLeft: 1 }}
-                    >
-                      Delete
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={6} align="center">
-                  No agents found.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+    <Box sx={{ padding: '2rem' }}>
+      {!isFormVisible ? (
+        <>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Typography variant="h4" component="h1">
+              Agent Management
+            </Typography>
+            <Button
+              variant="outlined"
+              color="primary"
+              startIcon={<AddIcon />}
+              onClick={handleAddClick}
+            >
+              Add Agent
+            </Button>
+          </Box>
+          <AgentList
+            agents={agents}
+            onEdit={handleEditClick}
+            onDelete={handleDeleteClick}
+          />
+        </>
+      ) : (
+        <AgentForm
+          onSubmit={handleFormSubmit}
+          agentData={editingAgent}
+          onCancel={handleCancel}
+        />
+      )}
     </Box>
   );
 };
