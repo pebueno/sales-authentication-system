@@ -1,12 +1,16 @@
 import { useAuthenticatedApi } from './useAuth';
-import { Agent } from '../components/common/types';
 
 export const useAgents = () => {
   const api = useAuthenticatedApi();
 
-  const fetchAgents = async (): Promise<Agent[]> => {
-    const response = await api.get('/agents');
-    return response.data;
+  const fetchAgents = async () => {
+    try {
+      const response = await api.get('/agents');
+      return response.data; // Assume this is the array of agents
+    } catch (error) {
+      console.error('Error fetching agents:', error);
+      throw error;
+    }
   };
 
   return { fetchAgents };
