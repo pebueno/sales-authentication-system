@@ -18,12 +18,7 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  return (
-    <div>
-      <h1>Login</h1>
-      <LoginForm onSubmit={handleLogin} />
-    </div>
-  );
+  return <LoginForm onSubmit={handleLogin} />;
 };
 
 export default LoginPage;

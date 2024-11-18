@@ -1,12 +1,12 @@
 import React from 'react';
+import RegisterForm from '../components/RegisterForm';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import RegisterForm from '../components/RegisterForm';
 import { RegisterUserData } from '../components/common/types';
 
 const RegisterPage: React.FC = () => {
-  const navigate = useNavigate();
   const { register } = useAuth();
+  const navigate = useNavigate();
 
   const handleRegister = async (data: RegisterUserData) => {
     try {
@@ -14,17 +14,16 @@ const RegisterPage: React.FC = () => {
       alert('Registration successful! Please log in.');
       navigate('/login');
     } catch (error) {
-      console.error('Registration failed:', error);
-      alert('Registration failed. Please try again.');
+      alert('Registration failed.');
+      console.error('Error during registration:', error);
     }
   };
 
-  return (
-    <div className="card">
-      <h1>Register</h1>
-      <RegisterForm onSubmit={handleRegister} />
-    </div>
-  );
+  const handleGoBack = () => {
+    navigate('/login');
+  };
+
+  return <RegisterForm onSubmit={handleRegister} onGoBack={handleGoBack} />;
 };
 
 export default RegisterPage;
