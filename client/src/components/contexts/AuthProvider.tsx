@@ -36,8 +36,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       const decodedUser = jwtDecode(accessToken) as User;
-      setAuth({ user: decodedUser, token: accessToken });
-      localStorage.setItem('token', accessToken);
+      const newAuth = { user: decodedUser, token: accessToken };
+      setAuth(newAuth);
+      localStorage.setItem('auth', JSON.stringify(newAuth)); // Store both user and token in auth key
+      console.log({ accessToken });
     } catch (error) {
       console.error('Failed to decode token:', error);
       throw new Error('Invalid token received from server');
