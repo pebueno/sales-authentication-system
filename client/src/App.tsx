@@ -13,7 +13,7 @@ const LoginPage = lazy(() => import('./pages/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const AgentPage = lazy(() => import('./pages/AgentPage'));
 const CustomerPage = lazy(() => import('./pages/CustomerPage'));
-const Unauthorized = () => <h1>Unauthorized</h1>;
+const NotAuthorized = lazy(() => import('./pages/NotAuthorized'));
 
 const ROLES = {
   Admin: 'admin',
@@ -28,10 +28,14 @@ const App: React.FC = () => {
       <Suspense fallback={<Loader />}>
         <Routes>
           <Route element={<Layout />}>
-            {/* Public Routes */}
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/unauthorized" element={<Unauthorized />} />
+            {/* Guest-Only Routes */}
+            <Route element={<RequireAuth allowedRoles={[ROLES.Guest]} />}>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+            </Route>
+
+            {/* Unauthorized Page */}
+            <Route path="/unauthorized" element={<NotAuthorized />} />
 
             {/* Protected Routes */}
             <Route
@@ -49,6 +53,7 @@ const App: React.FC = () => {
             >
               <Route path="/customer" element={<CustomerPage />} />
             </Route>
+
             {/* Redirect invalid paths */}
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Route>

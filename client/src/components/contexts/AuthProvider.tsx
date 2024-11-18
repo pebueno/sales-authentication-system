@@ -8,7 +8,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [auth, setAuth] = useState<{ user: User | null; token: string | null }>(
     () => {
       const storedAuth = localStorage.getItem('auth');
-      return storedAuth ? JSON.parse(storedAuth) : { user: null, token: null };
+      if (storedAuth) {
+        const parsedAuth = JSON.parse(storedAuth);
+        // Ensure user role defaults to "guest" if undefined
+        if (parsedAuth.user) {
+          parsedAuth.user.role = parsedAuth.user.role || 'guest';
+        }
+        return parsedAuth;
+      }
+      return { user: null, token: null };
     },
   );
 
@@ -36,10 +44,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       const decodedUser = jwtDecode(accessToken) as User;
-      const newAuth = { user: decodedUser, token: accessToken };
+      // Default the role to "guest" if it is not provided
+      const userWithRole = {
+        ...decodedUser,
+        role: decodedUser.role || 'guest',
+      };
+      const newAuth = { user: userWithRole, token: accessToken };
       setAuth(newAuth);
       localStorage.setItem('auth', JSON.stringify(newAuth)); // Store both user and token in auth key
-      console.log({ accessToken });
     } catch (error) {
       console.error('Failed to decode token:', error);
       throw new Error('Invalid token received from server');
