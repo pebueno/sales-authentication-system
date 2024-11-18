@@ -1,3 +1,5 @@
+import { types } from 'util';
+
 export interface Agent {
   agentCode: string;
   agentName: string;
@@ -38,3 +40,26 @@ export type AuthContextType = {
   logout: () => void;
   register: (userData: RegisterUserData) => Promise<void>;
 };
+
+export interface Customer {
+  custCode: string;
+  custName: string;
+  custCity: string;
+  workingArea: string;
+  custCountry: string;
+  grade: number;
+  openingAmt: string;
+  receiveAmt: string;
+  paymentAmt: string;
+  outstandingAmt: string;
+  phoneNo: string;
+  agent: Agent;
+}
+
+export interface CustomerFormProps {
+  onSubmit: (formData: Partial<Customer>) => void;
+  customerData?: Partial<Customer>;
+  onCancel: () => void;
+  availableAgents: Agent[];
+  isEditMode: boolean;
+}

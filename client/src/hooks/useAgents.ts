@@ -1,4 +1,5 @@
 import { useAuthenticatedApi } from './useAuth';
+import { Agent } from '../components/common/types';
 
 export const useAgents = () => {
   const api = useAuthenticatedApi();
@@ -13,7 +14,7 @@ export const useAgents = () => {
     }
   };
 
-  const addAgent = async (agentData: any) => {
+  const addAgent = async (agentData: Agent) => {
     try {
       const response = await api.post('/agents', agentData);
       return response.data;
@@ -23,7 +24,7 @@ export const useAgents = () => {
     }
   };
 
-  const updateAgent = async (agentCode: string, agentData: any) => {
+  const updateAgent = async (agentCode: string, agentData: Agent) => {
     try {
       const response = await api.patch(`/agents/${agentCode}`, agentData);
       return response.data;
