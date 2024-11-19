@@ -47,5 +47,57 @@ export const useOrders = () => {
     }
   };
 
-  return { fetchOrders, addOrder, updateOrder, deleteOrder };
+  const fetchTotalByCustomer = async () => {
+    try {
+      const response = await api.get('/orders/total-amount-by-customer');
+      // Transform data if necessary
+      return response.data.map((item: any) => ({
+        name: item.custCode,
+        value: item.totalOrdAmount,
+      }));
+    } catch (error) {
+      console.error('Error fetching total by customer:', error);
+      throw error;
+    }
+  };
+
+  const fetchTotalByAgent = async () => {
+    try {
+      const response = await api.get('/orders/total-amount-by-agent');
+      console.log(response.data);
+      // return response.data;
+      return response.data.map((item: any) => ({
+        name: item.agentCode,
+        value: item.totalOrdAmount,
+      }));
+    } catch (error) {
+      console.error('Error fetching total by agent:', error);
+      throw error;
+    }
+  };
+
+  const fetchTotalByCountry = async () => {
+    try {
+      const response = await api.get('/orders/total-amount-by-country');
+      console.log(response.data);
+      // return response.data;
+      return response.data.map((item: any) => ({
+        name: item.custCountry,
+        value: item.totalOrdAmount,
+      }));
+    } catch (error) {
+      console.error('Error fetching total by country:', error);
+      throw error;
+    }
+  };
+
+  return {
+    fetchOrders,
+    addOrder,
+    updateOrder,
+    deleteOrder,
+    fetchTotalByCustomer,
+    fetchTotalByAgent,
+    fetchTotalByCountry,
+  };
 };

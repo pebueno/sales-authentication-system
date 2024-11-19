@@ -1,15 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Typography, Stack, Grid } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useOrders } from '../hooks/useOrders';
 import { useAgents } from '../hooks/useAgents';
 import { useCustomers } from '../hooks/useCustomers';
 import OrderList from '../components/OrderList';
 import OrderForm from '../components/OrderForm';
+import SummaryCard from '../components/SummaryCard';
 import { Order, Agent, Customer } from '../components/common/types';
 
 const OrderPage: React.FC = () => {
-  const { fetchOrders, addOrder, updateOrder, deleteOrder } = useOrders();
+  const {
+    fetchOrders,
+    addOrder,
+    updateOrder,
+    deleteOrder,
+    fetchTotalByCustomer,
+    fetchTotalByAgent,
+    fetchTotalByCountry,
+  } = useOrders();
   const { fetchAgents } = useAgents();
   const { fetchCustomers } = useCustomers();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -17,19 +26,29 @@ const OrderPage: React.FC = () => {
   const [editingOrder, setEditingOrder] = useState<Partial<Order> | null>(null);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [totalByCustomer, setTotalByCustomer] = useState([]);
+  const [totalByAgent, setTotalByAgent] = useState([]);
+  const [totalByCountry, setTotalByCountry] = useState([]);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [orders, customers, agents] = await Promise.all([
-          fetchOrders(),
-          fetchCustomers(),
-          fetchAgents(),
-        ]);
+        const [orders, customers, agents, byCustomer, byAgent, byCountry] =
+          await Promise.all([
+            fetchOrders(),
+            fetchCustomers(),
+            fetchAgents(),
+            fetchTotalByCustomer(),
+            fetchTotalByAgent(),
+            fetchTotalByCountry(),
+          ]);
 
         setOrders(orders || []);
         setCustomers(customers || []);
         setAgents(agents || []);
+        setTotalByCustomer(byCustomer || []);
+        setTotalByAgent(byAgent || []);
+        setTotalByCountry(byCountry || []);
       } catch (error) {
         console.error('Failed to load data:', error);
       }
@@ -75,7 +94,6 @@ const OrderPage: React.FC = () => {
         );
         alert('Order updated successfully!');
       } else {
-        // await addOrder(formattedData);
         const newOrder = await addOrder(formattedData);
         setOrders((prev) => [...prev, newOrder]);
         alert('Order added successfully!');
@@ -96,41 +114,58 @@ const OrderPage: React.FC = () => {
 
   return (
     <Box sx={{ padding: '2rem' }}>
-      {!isFormVisible ? (
-        <>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Typography variant="h4" component="h1">
-              Order Management
-            </Typography>
-            <Button
-              variant="outlined"
-              color="primary"
-              startIcon={<AddIcon />}
-              onClick={handleAddClick}
-            >
-              Add Order
-            </Button>
-          </Box>
-          <OrderList
-            orders={orders}
-            onEdit={handleEditClick}
-            onDelete={handleDeleteClick}
+      <Grid container spacing={3} justifyContent="center">
+        <Grid item xs={12} sm={6} md={4}>
+          <SummaryCard
+            title="Total Orders by Customer"
+            data={totalByCustomer}
           />
-        </>
-      ) : (
-        <OrderForm
-          onSubmit={handleFormSubmit}
-          orderData={editingOrder || undefined}
-          onCancel={handleCancel}
-          availableAgents={agents}
-          availableCustomers={customers}
-          isEditMode={!!editingOrder}
-        />
-      )}
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <SummaryCard title="Total Orders by Agent" data={totalByAgent} />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <SummaryCard title="Total Orders by Country" data={totalByCountry} />
+        </Grid>
+      </Grid>
+
+      <Box mt={4}>
+        {!isFormVisible ? (
+          <>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Typography variant="h4" component="h1">
+                Order Management
+              </Typography>
+              <Button
+                variant="outlined"
+                color="primary"
+                startIcon={<AddIcon />}
+                onClick={handleAddClick}
+              >
+                Add Order
+              </Button>
+            </Box>
+            <OrderList
+              orders={orders}
+              onEdit={handleEditClick}
+              onDelete={handleDeleteClick}
+            />
+          </>
+        ) : (
+          <OrderForm
+            onSubmit={handleFormSubmit}
+            orderData={editingOrder || undefined}
+            onCancel={handleCancel}
+            availableAgents={agents}
+            availableCustomers={customers}
+            isEditMode={!!editingOrder}
+          />
+        )}
+      </Box>
     </Box>
   );
 };
