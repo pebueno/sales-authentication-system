@@ -28,12 +28,21 @@ const Navbar: React.FC = () => {
           >
             Agents
           </Button>
+
           <Button
             component={Link}
             to="/customer"
             sx={{ color: '#fff', textTransform: 'none' }}
           >
             Customers
+          </Button>
+
+          <Button
+            component={Link}
+            to="/orders"
+            sx={{ color: '#fff', textTransform: 'none' }}
+          >
+            Orders
           </Button>
         </Box>
 

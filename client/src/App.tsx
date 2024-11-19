@@ -13,6 +13,7 @@ const LoginPage = lazy(() => import('./pages/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const AgentPage = lazy(() => import('./pages/AgentPage'));
 const CustomerPage = lazy(() => import('./pages/CustomerPage'));
+const OrderPage = lazy(() => import('./pages/OrderPage'));
 const NotAuthorized = lazy(() => import('./pages/NotAuthorized'));
 
 const ROLES = {
@@ -52,6 +53,14 @@ const App: React.FC = () => {
               }
             >
               <Route path="/customer" element={<CustomerPage />} />
+            </Route>
+
+            <Route
+              element={
+                <RequireAuth allowedRoles={[ROLES.Admin, ROLES.Agent]} />
+              }
+            >
+              <Route path="/orders" element={<OrderPage />} />
             </Route>
 
             {/* Redirect invalid paths */}

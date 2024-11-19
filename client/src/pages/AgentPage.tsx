@@ -15,13 +15,14 @@ const AgentPage: React.FC = () => {
     const loadAgents = async () => {
       try {
         const data = await fetchAgents();
-        setAgents(data);
+        setAgents(data || []);
       } catch (error) {
         console.error('Failed to fetch agents:', error);
       }
     };
+
     loadAgents();
-  }, [fetchAgents]);
+  }, []);
 
   // Handle form submission (add or update)
   const handleFormSubmit = async (formData: any) => {

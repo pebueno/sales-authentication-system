@@ -18,26 +18,22 @@ const CustomerPage: React.FC = () => {
   const [agents, setAgents] = useState<Agent[]>([]);
 
   useEffect(() => {
-    const loadCustomers = async () => {
+    const loadData = async () => {
       try {
-        const data = await fetchCustomers();
-        setCustomers(data);
-      } catch (error) {
-        console.error('Failed to load customers:', error);
-      }
-    };
-    loadCustomers();
+        const [customers, agents] = await Promise.all([
+          fetchCustomers(),
+          fetchAgents(),
+        ]);
 
-    const loadAgents = async () => {
-      try {
-        const data = await fetchAgents();
-        setAgents(data);
+        setCustomers(customers || []);
+        setAgents(agents || []);
       } catch (error) {
-        console.error('Failed to load agents:', error);
+        console.error('Failed to load data:', error);
       }
     };
-    loadAgents();
-  }, [fetchCustomers, fetchAgents]);
+
+    loadData();
+  }, []);
 
   const handleAddClick = () => {
     setFormVisible(true);
@@ -63,7 +59,7 @@ const CustomerPage: React.FC = () => {
     try {
       const formattedData = {
         ...customerData,
-        agentCode: customerData.agent?.agentCode, // Ensure agentCode is a string
+        agentCode: customerData.agent?.agentCode,
       };
 
       if (editingCustomer) {

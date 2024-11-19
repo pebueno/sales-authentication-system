@@ -26,6 +26,7 @@ export const useCustomers = () => {
   const updateCustomer = async (custCode: string, customerData: any) => {
     try {
       const response = await api.patch(`/customers/${custCode}`, customerData);
+      console.log(response);
       return response.data;
     } catch (error) {
       console.error('Error updating customer:', error);

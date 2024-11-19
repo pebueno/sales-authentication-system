@@ -63,3 +63,22 @@ export interface CustomerFormProps {
   availableAgents: Agent[];
   isEditMode: boolean;
 }
+
+export interface Order {
+  ordNum: number;
+  ordAmount: number;
+  advanceAmount: number;
+  ordDate: string;
+  ordDescription: string;
+  customer: Customer;
+  agent: Agent;
+}
+
+export interface OrderFormProps {
+  onSubmit: (formData: Partial<Order>) => void;
+  orderData?: Partial<Order>;
+  availableAgents: Agent[];
+  availableCustomers: Customer[];
+  onCancel: () => void;
+  isEditMode: boolean;
+}

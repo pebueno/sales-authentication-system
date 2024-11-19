@@ -30,10 +30,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
     paymentAmt: customerData?.paymentAmt || '',
     outstandingAmt: customerData?.outstandingAmt || '',
     phoneNo: customerData?.phoneNo || '',
-    agent:
-      typeof customerData?.agentCode === 'string'
-        ? customerData.agentCode
-        : customerData?.agentCode || '',
+    agent: customerData?.agentCode || '',
   });
 
   const handleChange = (
@@ -177,10 +174,8 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
         <Select
           value={formData.agent?.agentCode || ''}
           onChange={handleAgentChange}
-          fullWidth
-          required
         >
-          {availableAgents.map((agent) => (
+          {availableAgents.map((agent: Agent) => (
             <MenuItem key={agent.agentCode} value={agent.agentCode}>
               {agent.agentName}
             </MenuItem>
