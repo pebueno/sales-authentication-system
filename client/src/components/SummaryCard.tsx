@@ -7,11 +7,7 @@ type SummaryCardProps = {
 };
 
 const SummaryCard: React.FC<SummaryCardProps> = ({ title, data }) => {
-  // Calculate the total amount
-  // const totalAmount = data.reduce((sum, item) => sum + item.value, 0);
   const totalAmount = data.reduce((sum, item) => sum + Number(item.value), 0);
-  console.log({ data });
-  // Display the first two items
   const displayedItems = data.slice(0, 2);
 
   return (

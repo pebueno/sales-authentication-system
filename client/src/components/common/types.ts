@@ -48,10 +48,10 @@ export interface Customer {
   workingArea: string;
   custCountry: string;
   grade: number;
-  openingAmt: string;
-  receiveAmt: string;
-  paymentAmt: string;
-  outstandingAmt: string;
+  openingAmt: number;
+  receiveAmt: number;
+  paymentAmt: number;
+  outstandingAmt: number;
   phoneNo: string;
   agent: Agent;
 }
@@ -82,3 +82,13 @@ export interface OrderFormProps {
   onCancel: () => void;
   isEditMode: boolean;
 }
+
+export type AgentListProps = {
+  agents: any[];
+  onEdit: (agent: any) => void;
+  onDelete: (agentCode: string) => void;
+  onPageChange: (event: any, page: number) => void;
+  rowChange: (event: any) => void;
+  rowsPerPage: number;
+  page: number;
+};

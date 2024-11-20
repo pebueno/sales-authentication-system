@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Typography, Stack, Grid } from '@mui/material';
+import { Box, Button, Typography, Grid } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useOrders } from '../hooks/useOrders';
 import { useAgents } from '../hooks/useAgents';
 import { useCustomers } from '../hooks/useCustomers';
-import OrderList from '../components/OrderList';
 import OrderForm from '../components/OrderForm';
+import OrderList from '../components/OrderList';
 import SummaryCard from '../components/SummaryCard';
 import { Order, Agent, Customer } from '../components/common/types';
+import PaginatedTable from '../components/PaginatedTable';
 
 const OrderPage: React.FC = () => {
   const {
@@ -29,7 +30,8 @@ const OrderPage: React.FC = () => {
   const [totalByCustomer, setTotalByCustomer] = useState([]);
   const [totalByAgent, setTotalByAgent] = useState([]);
   const [totalByCountry, setTotalByCountry] = useState([]);
-
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [page, setPage] = useState(0);
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -44,6 +46,8 @@ const OrderPage: React.FC = () => {
           ]);
 
         setOrders(orders || []);
+        console.log(orders);
+
         setCustomers(customers || []);
         setAgents(agents || []);
         setTotalByCustomer(byCustomer || []);
@@ -88,14 +92,20 @@ const OrderPage: React.FC = () => {
       if (editingOrder) {
         await updateOrder(editingOrder.ordNum, formattedData);
         setOrders((prev: any) =>
-          prev.map((c: any) =>
-            c.ordNum === editingOrder.ordNum ? { ...c, ...formattedData } : c,
+          prev.map((order: any) =>
+            order.ordNum === editingOrder.ordNum
+              ? { ...order, ...formattedData }
+              : order,
           ),
         );
+        console.log(orders);
+
         alert('Order updated successfully!');
       } else {
         const newOrder = await addOrder(formattedData);
         setOrders((prev) => [...prev, newOrder]);
+        console.log(orders);
+
         alert('Order added successfully!');
       }
 
@@ -111,6 +121,26 @@ const OrderPage: React.FC = () => {
     setFormVisible(false);
     setEditingOrder(null);
   };
+
+  const handlePageChange = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleRowsPerPageChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+  const columns = [
+    { id: 'ordNum', label: 'Order Number' },
+    { id: 'ordAmount', label: 'Order Amount' },
+    { id: 'advanceAmount', label: 'Advance Amount' },
+    { id: 'ordDate', label: 'Order Date' },
+    { id: 'ordDescription', label: 'Order Description' },
+    { id: 'customerName', label: 'Customer Name' },
+    { id: 'agentName', label: 'Agent Name' },
+  ];
 
   return (
     <Box sx={{ padding: '2rem' }}>
@@ -149,10 +179,21 @@ const OrderPage: React.FC = () => {
                 Add Order
               </Button>
             </Box>
-            <OrderList
-              orders={orders}
+            <PaginatedTable
+              columns={columns}
+              rows={orders.map((order) => ({
+                ...order,
+                agentName: order.agentCode?.agentName || 'N/A',
+                custName: order.custCode?.custName || 'N/A',
+              }))}
               onEdit={handleEditClick}
               onDelete={handleDeleteClick}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              count={orders.length}
+              onPageChange={handlePageChange}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              actions
             />
           </>
         ) : (

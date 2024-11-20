@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useAgents } from '../hooks/useAgents';
-import AgentList from '../components/AgentList';
+import PaginatedTable from '../components/PaginatedTable';
 import AgentForm from '../components/AgentForm';
 
 const AgentPage: React.FC = () => {
@@ -10,7 +10,10 @@ const AgentPage: React.FC = () => {
   const [agents, setAgents] = useState<any[]>([]);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [editingAgent, setEditingAgent] = useState<any | null>(null);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [page, setPage] = useState(0);
 
+  // Fetch agents when the component is mounted
   useEffect(() => {
     const loadAgents = async () => {
       try {
@@ -20,11 +23,24 @@ const AgentPage: React.FC = () => {
         console.error('Failed to fetch agents:', error);
       }
     };
-
     loadAgents();
   }, []);
 
-  // Handle form submission (add or update)
+  const handleAddClick = () => {
+    setEditingAgent(null);
+    setIsFormVisible(true);
+  };
+
+  const handleEditClick = (agent: any) => {
+    setEditingAgent(agent);
+    setIsFormVisible(true);
+  };
+
+  const handleCancel = () => {
+    setEditingAgent(null);
+    setIsFormVisible(false);
+  };
+
   const handleFormSubmit = async (formData: any) => {
     try {
       if (editingAgent) {
@@ -53,21 +69,6 @@ const AgentPage: React.FC = () => {
     }
   };
 
-  const handleAddClick = () => {
-    setEditingAgent(null);
-    setIsFormVisible(true);
-  };
-
-  const handleEditClick = (agent: any) => {
-    setEditingAgent(agent);
-    setIsFormVisible(true);
-  };
-
-  const handleCancel = () => {
-    setEditingAgent(null);
-    setIsFormVisible(false);
-  };
-
   const handleDeleteClick = async (agentCode: string) => {
     try {
       await deleteAgent(agentCode);
@@ -80,6 +81,26 @@ const AgentPage: React.FC = () => {
       alert('Failed to delete agent.');
     }
   };
+
+  const handlePageChange = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleRowsPerPageChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0); // Reset to the first page
+  };
+
+  const columns = [
+    { id: 'agentCode', label: 'Agent Code' },
+    { id: 'agentName', label: 'Agent Name' },
+    { id: 'workingArea', label: 'Working Area' },
+    { id: 'commission', label: 'Commission' },
+    { id: 'phoneNo', label: 'Phone No' },
+    { id: 'country', label: 'Country' },
+  ];
 
   return (
     <Box sx={{ padding: '2rem' }}>
@@ -102,10 +123,17 @@ const AgentPage: React.FC = () => {
               Add Agent
             </Button>
           </Box>
-          <AgentList
-            agents={agents}
+          <PaginatedTable
+            columns={columns}
+            rows={agents}
             onEdit={handleEditClick}
             onDelete={handleDeleteClick}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            count={agents.length}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleRowsPerPageChange}
+            actions
           />
         </>
       ) : (

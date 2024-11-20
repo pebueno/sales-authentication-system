@@ -25,10 +25,10 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
     workingArea: customerData?.workingArea || '',
     custCountry: customerData?.custCountry || '',
     grade: customerData?.grade || 0,
-    openingAmt: customerData?.openingAmt || '',
-    receiveAmt: customerData?.receiveAmt || '',
-    paymentAmt: customerData?.paymentAmt || '',
-    outstandingAmt: customerData?.outstandingAmt || '',
+    openingAmt: customerData?.openingAmt || 0,
+    receiveAmt: customerData?.receiveAmt || 0,
+    paymentAmt: customerData?.paymentAmt || 0,
+    outstandingAmt: customerData?.outstandingAmt || 0,
     phoneNo: customerData?.phoneNo || '',
     agent: customerData?.agentCode || '',
   });
@@ -38,6 +38,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    console.log({ availableAgents });
   };
 
   const handleAgentChange = (e: React.ChangeEvent<{ value: unknown }>) => {

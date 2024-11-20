@@ -3,9 +3,8 @@ import { Box, Button, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useCustomers } from '../hooks/useCustomers';
 import { useAgents } from '../hooks/useAgents';
-
 import CustomerForm from '../components/CustomerForm';
-import CustomerList from '../components/CustomerList';
+import PaginatedTable from '../components/PaginatedTable';
 import { Customer, Agent } from '../components/common/types';
 
 const CustomerPage: React.FC = () => {
@@ -16,6 +15,8 @@ const CustomerPage: React.FC = () => {
   const [isFormVisible, setFormVisible] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [agents, setAgents] = useState<Agent[]>([]);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [page, setPage] = useState(0);
 
   useEffect(() => {
     const loadData = async () => {
@@ -64,8 +65,8 @@ const CustomerPage: React.FC = () => {
 
       if (editingCustomer) {
         await updateCustomer(editingCustomer.custCode, formattedData);
-        setCustomers((prev: any) =>
-          prev.map((c: any) =>
+        setCustomers((prev) =>
+          prev.map((c) =>
             c.custCode === editingCustomer.custCode
               ? { ...c, ...formattedData }
               : c,
@@ -90,6 +91,32 @@ const CustomerPage: React.FC = () => {
     setEditingCustomer(null);
   };
 
+  const handlePageChange = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleRowsPerPageChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const columns = [
+    { id: 'custCode', label: 'Customer Code' },
+    { id: 'custName', label: 'Customer Name' },
+    { id: 'custCity', label: 'City' },
+    { id: 'workingArea', label: 'Working Area' },
+    { id: 'custCountry', label: 'Country' },
+    { id: 'phoneNo', label: 'Phone No' },
+    { id: 'grade', label: 'Grade' },
+    { id: 'openingAmt', label: 'Opening Amount' },
+    { id: 'receiveAmt', label: 'Receive Amount' },
+    { id: 'paymentAmt', label: 'Payment Amount' },
+    { id: 'outstandingAmt', label: 'Outstanding Amount' },
+    { id: 'agentName', label: 'Agent Name' },
+  ];
+
   return (
     <Box sx={{ padding: '2rem' }}>
       {!isFormVisible ? (
@@ -111,10 +138,20 @@ const CustomerPage: React.FC = () => {
               Add Customer
             </Button>
           </Box>
-          <CustomerList
-            customers={customers}
+          <PaginatedTable
+            columns={columns}
+            rows={customers.map((customer) => ({
+              ...customer,
+              agentName: customer.agentCode?.agentName || 'N/A',
+            }))}
             onEdit={handleEditClick}
             onDelete={handleDeleteClick}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            count={customers.length}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleRowsPerPageChange}
+            actions
           />
         </>
       ) : (

@@ -30,7 +30,6 @@ export const useOrders = () => {
   ): Promise<Order> => {
     try {
       const response = await api.patch(`/orders/${ordNum}`, orderData);
-      console.log(response);
       return response.data;
     } catch (error) {
       console.error('Error updating order:', error);
@@ -50,7 +49,7 @@ export const useOrders = () => {
   const fetchTotalByCustomer = async () => {
     try {
       const response = await api.get('/orders/total-amount-by-customer');
-      // Transform data if necessary
+
       return response.data.map((item: any) => ({
         name: item.custCode,
         value: item.totalOrdAmount,
@@ -64,8 +63,6 @@ export const useOrders = () => {
   const fetchTotalByAgent = async () => {
     try {
       const response = await api.get('/orders/total-amount-by-agent');
-      console.log(response.data);
-      // return response.data;
       return response.data.map((item: any) => ({
         name: item.agentCode,
         value: item.totalOrdAmount,
@@ -79,8 +76,6 @@ export const useOrders = () => {
   const fetchTotalByCountry = async () => {
     try {
       const response = await api.get('/orders/total-amount-by-country');
-      console.log(response.data);
-      // return response.data;
       return response.data.map((item: any) => ({
         name: item.custCountry,
         value: item.totalOrdAmount,
